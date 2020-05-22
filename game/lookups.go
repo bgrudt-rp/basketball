@@ -1,43 +1,67 @@
 package game
 
-func getPlayerByID(i int) Player {
-	var pl Player
-	for _, p := range PlayerList {
-		if p.playerID == i {
-			pl = p
+import (
+	"basketball/data"
+	"fmt"
+)
+
+func getPlayerByID(p int, t map[string]data.Team) data.Player {
+	var pl data.Player
+	for _, l := range t {
+		for _, il := range l.Players {
+			if il.PlayerID == p {
+				pl = il
+			}
 		}
 	}
 	return pl
 }
-func getTeamByPlayerID(i int) Team {
-	var t Team
-	for _, p := range TeamList {
-		if p.teamID == i {
-			t = p
+
+func printGameScore(i int) {
+	var h int
+	var a int
+	t := make(map[string]data.Team)
+	m := make(map[int]int)
+	for _, s := range ShotList {
+		if s.madeShot {
+			for _, c := range data.TeamList {
+				for _, p := range c.Players {
+					if s.shooter == p.PlayerID {
+						m[c.TeamID] += s.value
+					}
+				}
+			}
 		}
 	}
-	return t
+
+	t["home"], t["away"] = getTeamsByGameID(i)
+	for k, v := range m {
+		if k == t["home"].TeamID {
+			h = v
+		}
+		if k == t["away"].TeamID {
+			a = v
+		}
+	}
+	fmt.Printf("\n\nFinal Score:\n"+
+		"%s : %d\n"+
+		"%s : %d\n", t["home"].Name, h, t["away"].Name, a)
 }
-func getTeamScores() (int, string, int, string) {
-	var t1 int
-	var t2 int
-	var n1 string
-	var n2 string
-	for _, t := range GameScore {
-		if t.teamID == 1 {
-			t1 = t.teamScore
-		}
-		if t.teamID == 2 {
-			t2 = t.teamScore
-		}
-	}
-	for _, t := range TeamList {
-		if t.teamID == 1 {
-			n1 = t.city
-		}
-		if t.teamID == 2 {
-			n2 = t.city
+
+func getTeamsByGameID(i int) (data.Team, data.Team) {
+	var h, a data.Team
+	for _, g := range data.GameList {
+		if g.GameID == i {
+			for _, c := range data.TeamList {
+				if c.TeamID == g.HomeTeam {
+					h = c
+				}
+				if c.TeamID == g.AwayTeam {
+					a = c
+				}
+			}
 		}
 	}
-	return t1, n1, t2, n2
+
+	return h, a
 }

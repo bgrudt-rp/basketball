@@ -1,6 +1,7 @@
 package game
 
 import (
+	"basketball/data"
 	"fmt"
 )
 
@@ -13,24 +14,8 @@ type Shot struct {
 	madeShot  bool
 }
 
-func scoreUpdate(a, b int, GameScore []TeamScore) {
-	p := getPlayerByID(b)
-	t := getTeamByPlayerID(p.team)
-	tid := t.teamID
-	var cScore int
-	var loc int
-	for i, t := range GameScore {
-		if t.teamID == tid {
-			cScore = t.teamScore
-			loc = i
-		}
-	}
-	nScore := cScore + a
-	GameScore[loc].teamScore = nScore
-}
-
 //ShotAttempt - takes a ShotList slice and adds a new Shot struct
-func ShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList *[]Shot) {
+func ShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList *[]Shot, t map[string]data.Team) {
 	var s Shot
 	s.value = value
 	s.shooter = shooter
@@ -39,48 +24,31 @@ func ShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList 
 	s.madeShot = madeShot
 	*ShotList = append(*ShotList, s)
 	if s.madeShot {
-		scoreUpdate(s.value, s.shooter, GameScore)
-		shotOutputMade(s)
+		shotOutputMade(s, t)
 	} else {
-		shotOutputMiss(s)
+		shotOutputMiss(s, t)
 	}
 }
 
-//ShotAttempt2 - returns a Shot struct to caller
-func ShotAttempt2(value, shooter, passer, rebounder int, madeShot bool) Shot {
-	var s Shot
-	s.value = value
-	s.shooter = shooter
-	s.passer = passer
-	s.rebounder = rebounder
-	s.madeShot = madeShot
-	if s.madeShot {
-		scoreUpdate(s.value, s.shooter, GameScore)
-		shotOutputMade(s)
-	} else {
-		shotOutputMiss(s)
-	}
-	return s
-}
-func shotOutputMade(s Shot) {
-	var sh Player
-	var a Player
+func shotOutputMade(s Shot, t map[string]data.Team) {
+	var sh data.Player
+	var a data.Player
 	sType := shotType(s.value)
-	sh = getPlayerByID(s.shooter)
-	a = getPlayerByID(s.passer)
+	sh = getPlayerByID(s.shooter, t)
+	a = getPlayerByID(s.passer, t)
 	fmt.Printf("\nSHOT WAS MADE\n"+
-		"%s hit a %s. ", sh.name, sType)
+		"%s hit a %s. ", sh.Name, sType)
 	if s.passer > 0 {
-		fmt.Printf("Assisted by %s.\n", a.name)
+		fmt.Printf("Assisted by %s.\n", a.Name)
 	}
 }
-func shotOutputMiss(s Shot) {
-	var sh Player
+func shotOutputMiss(s Shot, t map[string]data.Team) {
+	var sh data.Player
 	sType := shotType(s.value)
-	sh = getPlayerByID(s.shooter)
+	sh = getPlayerByID(s.shooter, t)
 
 	fmt.Printf("\nMissed shot\n"+
-		"%s missed a %s.\n", sh.name, sType)
+		"%s missed a %s.\n", sh.Name, sType)
 }
 
 func shotType(a int) string {
