@@ -45,6 +45,17 @@ func AdjustClock(g int, c GameClock, t time.Duration) GameClock {
 	return c
 }
 
+//GameTime input of time.Duration returns a quarter and time remaining value
+func GameTime(d time.Duration) (int, int, int) {
+	i := int(d)
+	q := i / 720000000000
+	q++
+	t := (720000000000 * q) - i
+	m := t / 60000000000
+	s := (t % 60000000000) / 1000000000
+	return q, m, s
+}
+
 //StartClock - start running game clock
 func StartClock(g int, c GameClock) GameClock {
 	if !c.currStart.Valid {

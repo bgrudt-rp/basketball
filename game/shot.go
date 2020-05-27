@@ -55,9 +55,10 @@ func shotOutputMade(s Shot, t map[string]data.Team, c time.Duration) {
 	sType := shotType(s.value)
 	sh = getPlayerByID(s.shooter, t)
 	a = getPlayerByID(s.passer, t)
-	fmt.Printf("(%v) -"+
-		"\nSHOT WAS MADE\n"+
-		"%s hit a %s. ", c.Seconds(), sh.Name, sType)
+	q, m, se := gameclock.GameTime(c)
+	fmt.Printf("(\nQ%v: %v:%02v\n) -"+
+		"SHOT WAS MADE\n"+
+		"%s hit a %s. ", q, m, se, sh.Name, sType)
 	if s.passer > 0 {
 		fmt.Printf("Assisted by %s.\n", a.Name)
 	}
@@ -66,10 +67,10 @@ func shotOutputMiss(s Shot, t map[string]data.Team, c time.Duration) {
 	var sh data.Player
 	sType := shotType(s.value)
 	sh = getPlayerByID(s.shooter, t)
-
-	fmt.Printf("(%v) -"+
-		"\nMissed shot\n"+
-		"%s missed a %s.\n", c.Seconds(), sh.Name, sType)
+	q, m, se := gameclock.GameTime(c)
+	fmt.Printf("(\nQ%v: %v:%02v\n) -"+
+		"Missed shot\n"+
+		"%s missed a %s.\n", q, m, se, sh.Name, sType)
 }
 
 func shotType(a int) string {
