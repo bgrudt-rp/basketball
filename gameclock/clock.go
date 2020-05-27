@@ -1,7 +1,6 @@
 package gameclock
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -24,19 +23,6 @@ type GameInc struct {
 type NullTime struct {
 	Time  time.Time
 	Valid bool
-}
-
-//ClockTest - temporary function to test clock
-func ClockTest() {
-	currGameClock := NewClock(1)
-	currGameClock = StartClock(1, currGameClock)
-	time.Sleep(2 * time.Second)
-	currGameClock = StopClock(1, currGameClock)
-	currGameClock = StartClock(1, currGameClock)
-	time.Sleep(1 * time.Second)
-	currGameClock = StopClock(1, currGameClock)
-	currGameClock = AdjustClock(1, currGameClock, 2.0)
-	timeElapsed(currGameClock)
 }
 
 //NewClock - generates a variable of type GameClock - beginning of game
@@ -84,10 +70,15 @@ func StopClock(g int, c GameClock) GameClock {
 	return c
 }
 
-func timeElapsed(c GameClock) {
+//TimeElapsed - show time elapsed in seconds
+func TimeElapsed(c GameClock) time.Duration {
 	var td time.Duration
+	if c.currStart.Valid {
+		t := time.Now()
+		td = td + t.Sub(c.currStart.Time)
+	}
 	for _, s := range c.gameDuration {
 		td = td + s.incDuration
 	}
-	fmt.Printf("Total time elapsed in seconds: %v\n", td.Seconds())
+	return td
 }

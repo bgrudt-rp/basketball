@@ -2,7 +2,9 @@ package game
 
 import (
 	"basketball/data"
+	"basketball/gameclock"
 	"fmt"
+	"time"
 )
 
 //Shot - EVENT - Player attempted shot
@@ -31,8 +33,9 @@ func modifyShotAttempt(value, shooter, passer, rebounder int, madeShot bool, sho
 }
 
 //newShotAttempt - takes a ShotList slice and adds a new Shot struct
-func newShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList *[]Shot, t map[string]data.Team) {
+func newShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList *[]Shot, t map[string]data.Team, c gameclock.GameClock) {
 	var s Shot
+	e := gameclock.TimeElapsed(c)
 	s.value = value
 	s.shooter = shooter
 	s.passer = passer
@@ -40,31 +43,33 @@ func newShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotLi
 	s.madeShot = madeShot
 	*ShotList = append(*ShotList, s)
 	if s.madeShot {
-		shotOutputMade(s, t)
+		shotOutputMade(s, t, e)
 	} else {
-		shotOutputMiss(s, t)
+		shotOutputMiss(s, t, e)
 	}
 }
 
-func shotOutputMade(s Shot, t map[string]data.Team) {
+func shotOutputMade(s Shot, t map[string]data.Team, c time.Duration) {
 	var sh data.Player
 	var a data.Player
 	sType := shotType(s.value)
 	sh = getPlayerByID(s.shooter, t)
 	a = getPlayerByID(s.passer, t)
-	fmt.Printf("\nSHOT WAS MADE\n"+
-		"%s hit a %s. ", sh.Name, sType)
+	fmt.Printf("(%v) -"+
+		"\nSHOT WAS MADE\n"+
+		"%s hit a %s. ", c.Seconds(), sh.Name, sType)
 	if s.passer > 0 {
 		fmt.Printf("Assisted by %s.\n", a.Name)
 	}
 }
-func shotOutputMiss(s Shot, t map[string]data.Team) {
+func shotOutputMiss(s Shot, t map[string]data.Team, c time.Duration) {
 	var sh data.Player
 	sType := shotType(s.value)
 	sh = getPlayerByID(s.shooter, t)
 
-	fmt.Printf("\nMissed shot\n"+
-		"%s missed a %s.\n", sh.Name, sType)
+	fmt.Printf("(%v) -"+
+		"\nMissed shot\n"+
+		"%s missed a %s.\n", c.Seconds(), sh.Name, sType)
 }
 
 func shotType(a int) string {

@@ -2,16 +2,19 @@ package game
 
 import (
 	"basketball/data"
+	"basketball/gameclock"
 	"fmt"
 )
 
 //ShotList - A list of shots in a game
 var ShotList []Shot
+var c gameclock.GameClock
 
 //StartGame - Designates the beginning of an active game
 func StartGame(a int) {
 	t := make(map[string]data.Team)
 	t["home"], t["away"] = getTeamsByGameID(a)
+	c = gameclock.NewClock(a)
 	liveGame(t)
 	endGame(a)
 }
