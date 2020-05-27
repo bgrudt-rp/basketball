@@ -14,8 +14,24 @@ type Shot struct {
 	madeShot  bool
 }
 
-//ShotAttempt - takes a ShotList slice and adds a new Shot struct
-func ShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList *[]Shot, t map[string]data.Team) {
+func deleteShotAttempt(shotID int) {
+	copy(ShotList[shotID:], ShotList[shotID+1:])
+	//ShotList[len(ShotList)-1] = ""
+	ShotList = ShotList[:len(ShotList)-1]
+}
+
+func modifyShotAttempt(value, shooter, passer, rebounder int, madeShot bool, shotID int) {
+	var s Shot
+	s.value = value
+	s.shooter = shooter
+	s.passer = passer
+	s.rebounder = rebounder
+	s.madeShot = madeShot
+	ShotList[shotID] = s
+}
+
+//newShotAttempt - takes a ShotList slice and adds a new Shot struct
+func newShotAttempt(value, shooter, passer, rebounder int, madeShot bool, ShotList *[]Shot, t map[string]data.Team) {
 	var s Shot
 	s.value = value
 	s.shooter = shooter
