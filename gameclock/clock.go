@@ -74,6 +74,7 @@ func StopClock(g int, c GameClock) GameClock {
 	if c.currStart.Valid {
 		t := time.Now()
 		var cd GameInc
+		c.currStart.Valid = false
 		cd.incStart = c.currStart.Time
 		cd.incStop = t
 		cd.incType = "Game Increment - Stopped"
